@@ -21,10 +21,16 @@ const Book = sequelize.define('Book', {
   totalCopies: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    validate: {
+      min: 1,
+    },
   },
   availableCopies: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    validate: {
+      min: 0,
+    },
   },
 });
 

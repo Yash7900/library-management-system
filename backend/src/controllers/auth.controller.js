@@ -1,9 +1,11 @@
 const bcrypt = require('bcrypt');
-const { User } = require('../models');
+const { User, RefreshToken } = require('../models');
 const {
   generateAccessToken,
   generateRefreshToken,
+  verifyRefreshToken,
 } = require('../utils/jwt');
+const { hashToken } = require('../utils/hash');
 
 exports.register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -24,8 +26,70 @@ exports.login = async (req, res) => {
 
   const payload = { id: user.id, role: user.role };
 
-  res.json({
-    accessToken: generateAccessToken(payload),
-    refreshToken: generateRefreshToken(payload),
+  const accessToken = generateAccessToken(payload);
+  const refreshToken = generateRefreshToken(payload);
+
+  await RefreshToken.create({
+    tokenHash: hashToken(refreshToken),
+    UserId: user.id,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   });
+
+  res.json({ accessToken, refreshToken });
+};
+
+exports.refresh = async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    return res.status(400).json({ message: 'Missing refresh token' });
+  }
+
+  let payload;
+  try {
+    payload = verifyRefreshToken(refreshToken);
+  } catch {
+    return res.status(401).json({ message: 'Invalid refresh token' });
+  }
+
+  const tokenHash = hashToken(refreshToken);
+
+  const storedToken = await RefreshToken.findOne({
+    where: { tokenHash },
+  });
+
+  if (!storedToken) {
+    return res.status(401).json({ message: 'Refresh token revoked' });
+  }
+
+  // Rotate token
+  await storedToken.destroy();
+
+  const newPayload = { id: payload.id, role: payload.role };
+
+  const newAccessToken = generateAccessToken(newPayload);
+  const newRefreshToken = generateRefreshToken(newPayload);
+
+  await RefreshToken.create({
+    tokenHash: hashToken(newRefreshToken),
+    UserId: payload.id,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  });
+
+  res.json({
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+  });
+};
+
+exports.logout = async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    return res.status(400).json({ message: 'Missing refresh token' });
+  }
+
+  await RefreshToken.destroy({
+    where: { tokenHash: hashToken(refreshToken) },
+  });
+
+  res.json({ message: 'Logged out' });
 };

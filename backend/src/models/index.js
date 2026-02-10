@@ -2,6 +2,16 @@ const sequelize = require('../database');
 
 const User = require('./user.model');
 const Book = require('./book.model');
+const Borrow = require('./borrow.model');
+const RefreshToken = require('./refresh-token.model');
+
+// Associations
+User.hasMany(RefreshToken, { onDelete: 'CASCADE' });
+RefreshToken.belongsTo(User);
+User.hasMany(Borrow);
+Borrow.belongsTo(User);
+Book.hasMany(Borrow);
+Borrow.belongsTo(Book);
 
 const initDb = async () => {
   let retries = 5;
@@ -24,5 +34,7 @@ module.exports = {
   sequelize,
   User,
   Book,
+  Borrow,
+  RefreshToken,
   initDb,
 };
