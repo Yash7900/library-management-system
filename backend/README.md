@@ -210,14 +210,4 @@ Via CLI
 docker exec -it library-management-system-postgres-1 \
 psql -U library_user -d library_db
 
-🧠 Design Decisions
-
-Derived fines (not stored) → avoids stale data
-
-JWT + refresh rotation → production-grade security
-
-Single /api namespace → frontend-agnostic
-
-RBAC middleware → clean authorization
-
-Docker-first setup → environment parity
+docker exec -it library-management-system-backend-1 npm run seed
