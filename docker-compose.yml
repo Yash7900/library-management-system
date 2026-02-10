@@ -43,6 +43,18 @@ services:
     depends_on:
       - frontend
       - backend
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: library-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@library.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 
 volumes:
   postgres_data:
