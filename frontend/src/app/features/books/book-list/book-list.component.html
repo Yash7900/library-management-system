@@ -25,7 +25,7 @@
             <td>{{ book.availableCopies }} / {{ book.totalCopies }}</td>
             <td>
               <button (click)="store.borrow(book.id)" [disabled]="book.availableCopies === 0">
-                Borrow
+                {{ book.availableCopies === 0 ? 'Unavailable' : 'Borrow' }}
               </button>
             </td>
           </tr>
