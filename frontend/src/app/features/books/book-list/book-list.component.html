@@ -1,0 +1,36 @@
+<div class="container">
+  <h2>Available Books</h2>
+
+  @if (store.loading()) {
+    <div>Loading books...</div>
+  }
+
+  @if (!store.loading()) {
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Genre</th>
+          <th>Available</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (book of store.books(); track $index) {
+          <tr>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.genre }}</td>
+            <td>{{ book.availableCopies }} / {{ book.totalCopies }}</td>
+            <td>
+              <button (click)="store.borrow(book.id)" [disabled]="book.availableCopies === 0">
+                Borrow
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

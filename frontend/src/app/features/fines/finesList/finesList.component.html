@@ -1,0 +1,39 @@
+<div class="container">
+  <h2 *ngIf="!isLibrarian()">My Fines</h2>
+  <h2 *ngIf="isLibrarian()">All Overdue Books</h2>
+
+  <div *ngIf="store.loading()">Loading...</div>
+
+  <table *ngIf="!store.loading() && store.fines().length">
+    <thead>
+      <tr>
+        <th *ngIf="isLibrarian()">User</th>
+        <th>Book</th>
+        <th>Due Date</th>
+        <th>Days Late</th>
+        <th>Fine</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (item of store.fines(); track $index) {
+        <tr>
+          @if (isLibrarian()) {
+            <td>
+              {{ item.user }}
+            </td>
+          }
+
+          <td>{{ item.book }}</td>
+          <td>{{ item.dueDate | date: 'mediumDate' : 'UTC' }}</td>
+          <td>{{ item.daysLate }}</td>
+          <td>₹ {{ item.fine }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (!store.loading() && !store.fines().length) {
+    <div>No fines 🎉</div>
+  }
+</div>

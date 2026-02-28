@@ -1,22 +1,16 @@
 <nav class="navbar" *ngIf="auth.isAuthenticated()">
-
-  <div class="brand">
-    📚 Library System
-  </div>
+  <div class="brand">📚 Library System</div>
 
   <div class="links">
-    <a routerLink="/">Home</a>
-    <a routerLink="/books">Books</a>
-    <a routerLink="/my-books">My Books</a>
-    <a routerLink="/fines">Fines</a>
+    <a [routerLink]="'/'">Home</a>
+    <a [routerLink]="'/books'">Books</a>
+    <a [routerLink]="'/my-books'">My Books</a>
+    <a [routerLink]="'/fines'">Fines</a>
 
-    <a *ngIf="isLibrarian()" routerLink="/manage-books">
-      Manage Books
-    </a>
+    <a *ngIf="isLibrarian()" [routerLink]="'/manage-books'"> Manage Books </a>
   </div>
 
   <div class="actions">
     <button (click)="logout()">Logout</button>
   </div>
-
 </nav>

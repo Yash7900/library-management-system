@@ -1,18 +1,16 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthStore } from '../../core/auth/auth.store';
 
-
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
 })
 export class NavbarComponent {
-
-   auth = inject(AuthStore);
+  auth = inject(AuthStore);
   router = inject(Router);
 
   logout() {

@@ -1,7 +1,20 @@
-const { Borrow, Book } = require('../models');
+const { Borrow, Book } = require("../models");
 
 const BORROW_DAYS = 14;
 const RENEW_DAYS = 7;
+
+// Get current user's borrowed books
+exports.getMyBorrows = async (req, res) => {
+  const userId = req.user.id;
+
+  const borrows = await Borrow.findAll({
+    where: { UserId: userId, returnedAt: null },
+    include: Book,
+    order: [["createdAt", "DESC"]],
+  });
+
+  res.json(borrows);
+};
 
 // Borrow a book
 exports.borrowBook = async (req, res) => {
@@ -9,10 +22,10 @@ exports.borrowBook = async (req, res) => {
   const { bookId } = req.body;
 
   const book = await Book.findByPk(bookId);
-  if (!book) return res.status(404).json({ message: 'Book not found' });
+  if (!book) return res.status(404).json({ message: "Book not found" });
 
   if (book.availableCopies <= 0) {
-    return res.status(400).json({ message: 'No copies available' });
+    return res.status(400).json({ message: "No copies available" });
   }
 
   const existing = await Borrow.findOne({
@@ -24,7 +37,7 @@ exports.borrowBook = async (req, res) => {
   });
 
   if (existing) {
-    return res.status(400).json({ message: 'Book already borrowed' });
+    return res.status(400).json({ message: "Book already borrowed" });
   }
 
   const dueDate = new Date();
@@ -49,11 +62,11 @@ exports.returnBook = async (req, res) => {
 
   const borrow = await Borrow.findByPk(borrowId, { include: Book });
   if (!borrow || borrow.returnedAt) {
-    return res.status(404).json({ message: 'Borrow record not found' });
+    return res.status(404).json({ message: "Borrow record not found" });
   }
 
   if (borrow.UserId !== userId) {
-    return res.status(403).json({ message: 'Not your borrowed book' });
+    return res.status(403).json({ message: "Not your borrowed book" });
   }
 
   borrow.returnedAt = new Date();
@@ -62,7 +75,7 @@ exports.returnBook = async (req, res) => {
   borrow.Book.availableCopies += 1;
   await borrow.Book.save();
 
-  res.json({ message: 'Book returned' });
+  res.json({ message: "Book returned" });
 };
 
 // Renew book
@@ -72,22 +85,24 @@ exports.renewBook = async (req, res) => {
 
   const borrow = await Borrow.findByPk(borrowId);
   if (!borrow || borrow.returnedAt) {
-    return res.status(404).json({ message: 'Borrow record not found' });
+    return res.status(404).json({ message: "Borrow record not found" });
   }
 
   if (borrow.UserId !== userId) {
-    return res.status(403).json({ message: 'Not your borrowed book' });
+    return res.status(403).json({ message: "Not your borrowed book" });
   }
 
   if (borrow.renewCount >= 1) {
-    return res.status(400).json({ message: 'Renew limit reached' });
+    return res.status(400).json({ message: "Renew limit reached" });
   }
 
   if (new Date() > borrow.dueDate) {
-    return res.status(400).json({ message: 'Book overdue, cannot renew' });
+    return res.status(400).json({ message: "Book overdue, cannot renew" });
   }
 
-  borrow.dueDate.setDate(borrow.dueDate.getDate() + RENEW_DAYS);
+  borrow.dueDate = new Date(
+    borrow.dueDate.getTime() + RENEW_DAYS * 24 * 60 * 60 * 1000,
+  );
   borrow.renewCount += 1;
   await borrow.save();
 

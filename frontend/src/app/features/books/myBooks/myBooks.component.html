@@ -1,0 +1,47 @@
+<div class="container">
+  <h2>My Borrowed Books</h2>
+
+  @if (store.loading()) {
+    <div>Loading...</div>
+  }
+  @if (!store.loading() && store.borrowed().length) {
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (item of store.borrowed(); track $index) {
+          <tr>
+            <td>{{ item.Book.title }}</td>
+            <td>{{ item.dueDate | date: 'mediumDate' : 'UTC' }}</td>
+
+            <td>
+              @if (isOverdue(item.dueDate)) {
+                <span style="color: red"> Overdue </span>
+              }
+              @if (!isOverdue(item.dueDate)) {
+                <span style="color: green"> Active </span>
+              }
+            </td>
+
+            <td>
+              <button (click)="store.returnBook(item.id)">Return</button>
+
+              <button (click)="store.renewBook(item.id)">Renew</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (!store.loading() && !store.borrowed().length) {
+    <div>No borrowed books.</div>
+  }
+</div>
