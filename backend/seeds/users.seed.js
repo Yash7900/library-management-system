@@ -1,4 +1,3 @@
-const bcrypt = require('bcrypt');
 const { User } = require('../src/models');
 
 const seedUsers = async () => {
@@ -10,12 +9,10 @@ const seedUsers = async () => {
     return;
   }
 
-  const passwordHash = await bcrypt.hash('admin123', 10);
-
   await User.create({
     name: 'Head Librarian',
     email,
-    password: passwordHash,
+    password: 'admin123',
     role: 'LIBRARIAN',
   });
 

@@ -1,0 +1,27 @@
+.login-container {
+  width: 320px;
+  margin: 80px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: Arial;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0 16px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.error {
+  color: red;
+}
